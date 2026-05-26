@@ -1,0 +1,15 @@
+Warehouse Kadikoy 5
+Warehouse Besiktas 8
+Warehouse Uskudar 6
+Kadikoy Besiktas 12
+Kadikoy Uskudar 3
+Kadikoy Bakirkoy 15
+Besiktas Sisli 4
+Besiktas Bakirkoy 10
+Uskudar Fatih 7
+Sisli Fatih 9
+Sisli Bakirkoy 6
+Fatih Bakirkoy 11
+Fatih Beyoglu 5
+Beyoglu Sisli 3
+Beyoglu Besiktas 7
