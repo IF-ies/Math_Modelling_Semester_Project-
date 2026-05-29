@@ -18,9 +18,11 @@
 
 | # | Name Surname | Student ID |
 |---|-------------|------------|
-| 1 | İbrahim Furkan Yılmaz | 2211051013 |
-| 2 | [Name Surname] | [Student ID] |
-| 3 | [Name Surname] | [Student ID] |
+| 1 | Ahmet Uzungöl | 2211051063 |
+| 2 | Sümeyra Yıldız | 2211051070 |
+| 3 | Züheyr Temel | 2211051067 |
+| 4 | Abdullah İnce | 2211051010 |
+| 5 | İbrahim Furkan Yılmaz | 2211051013 |
 
 **Instructor:** Cavidan Yakupoğlu Karaağaç
 
@@ -55,7 +57,7 @@
 **Tagline:** *Delivering Smarter, Faster, Together.*
 
 **Mission Statement:**
-Veteran is an urban logistics technology company whose mission is to optimize last-mile package delivery across metropolitan areas by leveraging advanced data structures and graph algorithms. In a landscape where urban congestion, rising delivery volumes, and customer expectations converge, Veteran applies rigorous mathematical modelling — from self-balancing search trees to shortest-path computations — to ensure that every package reaches its destination via the most efficient route, loaded onto trucks in the optimal order, and tracked through an immutable master registry from intake to delivery.
+Veteran, Kayseri'nin metropoliten alanında son mil paket teslimatını optimize etmeyi hedefleyen bir kentsel lojistik teknoloji şirketidir. Merkez deposu Meydan semtinde konumlanan Veteran, ileri veri yapıları ve graf algoritmalarından yararlanarak her paketin en verimli rotayla teslim edilmesini sağlar. Alpaslan, Talas, Erkilet, Belsin, İldem, Mimsin, Anbar ve Kocasinan gibi Kayseri semtleri arasındaki bağlantıları modelleyen ağ yapısı; Dijkstra'nın en kısa yol algoritması, Prim'in Minimum Spanning Tree algoritması, AVL ağacı tabanlı adres rehberi ve immutable master kayıt defteri aracılığıyla yönetilmektedir.
 
 ---
 
@@ -72,13 +74,33 @@ src/
     ├── linear/
     │   ├── SinglyLinkedList.java         // Master Registry
     │   ├── DoublyLinkedList.java         // Intake Buffer
-    │   ├── DeliveryQueue.java           // FIFO Queue
-    │   └── TruckStack.java             // LIFO Stack
+    │   ├── DeliveryQueue.java            // FIFO Queue
+    │   └── TruckStack.java              // LIFO Stack
     ├── tree/
-    │   └── AVLTree.java                 // Address Directory
+    │   └── AVLTree.java                  // Address Directory
     └── graph/
-        └── CityGraph.java               // City Map + Dijkstra + Prim
+        └── CityGraph.java                // City Map + Dijkstra + Prim
 ```
+
+**Kayseri Şehir Haritası (mapData.txt):**
+
+| Kaynak | Hedef | Mesafe (km) |
+|--------|-------|-------------|
+| Meydan | Alpaslan | 4 |
+| Meydan | Talas | 8 |
+| Meydan | Erkilet | 10 |
+| Meydan | Belsin | 12 |
+| Meydan | Kocasinan | 7 |
+| Alpaslan | Talas | 5 |
+| Alpaslan | Erkilet | 9 |
+| Alpaslan | Ildem | 12 |
+| Talas | Mimsin | 11 |
+| Talas | Ildem | 8 |
+| Belsin | Anbar | 3 |
+| Belsin | Erkilet | 14 |
+| Ildem | Mimsin | 6 |
+| Kocasinan | Alpaslan | 6 |
+| Kocasinan | Belsin | 9 |
 
 **Data flow through the system:**
 
@@ -122,7 +144,7 @@ src/
 
 ### 3.1 Domain Model — `Package.java`
 
-The `Package` class encapsulates four attributes: `packageID` (String), `destination` (String), `priority` (int, 1–5), and `weightKg` (double). It provides two constructors: a full four-argument constructor and a simplified two-argument constructor that defaults `priority` to 3 and `weightKg` to 1.0. Full getter/setter encapsulation and a formatted `toString()` override are included.
+The `Package` class encapsulates four attributes: `packageID` (String, e.g. `PKG_KYS_001`), `destination` (String, e.g. `Talas`), `priority` (int, 1–5), and `weightKg` (double). It provides two constructors: a full four-argument constructor and a simplified two-argument constructor that defaults `priority` to 3 and `weightKg` to 1.0.
 
 ### 3.2 Master Registry — Singly Linked List (SLL)
 
@@ -148,65 +170,49 @@ The `SinglyLinkedList` class uses a private inner `Node` class containing a `Pac
 
 The `DoublyLinkedList` class uses a private inner `Node` with three fields: `Package data`, `Node prev`, and `Node next`. The list maintains `head`, `tail`, and `size`.
 
-- **`insertAtTail(Package pkg)`** — If `tail == null` (empty list), both `head` and `tail` point to the new node. Otherwise, the new node's `prev` is set to the current `tail`, the current `tail.next` is set to the new node, and `tail` is advanced. Direct `tail` pointer access ensures **O(1)**.
+- **`insertAtTail(Package pkg)`** — Direct `tail` pointer access ensures **O(1)**.
 
-- **`insertAtHead(Package pkg)`** — Symmetric to `insertAtTail`: the new node's `next` points to the current `head`, `head.prev` is set to the new node, and `head` is reassigned. **O(1)**.
+- **`insertAtHead(Package pkg)`** — Direct `head` pointer access ensures **O(1)**.
 
-- **`removeFromHead()`** — Saves `head.data`, then checks if `head == tail` (single element) — if so, both are nulled. Otherwise, `head` advances to `head.next` and the new head's `prev` is nulled. **O(1)**.
+- **`removeFromHead()`** — `head` advances to `head.next` and the new head's `prev` is nulled. **O(1)**.
 
-- **`removeFromTail()`** — Symmetric: saves `tail.data`, handles the single-element edge case, otherwise retreats `tail` to `tail.prev` and nulls `tail.next`. **O(1)**.
+- **`removeFromTail()`** — `tail` retreats to `tail.prev`; the `prev` pointer enables this to be **O(1)** (unlike SLL which would require O(n)).
 
-- **`removePackage(String packageID)`** — Linear traversal from `head`. When a match is found (via `equalsIgnoreCase`), the node is unlinked by updating `current.prev.next` and `current.next.prev`, with special-case handling when the target is the head or tail. **O(n)** worst-case.
+- **`removePackage(String packageID)`** — Linear traversal from `head`. **O(n)** worst-case.
 
-- **`displayBuffer()` / `displayReverse()`** — Forward traversal via `next` pointers and backward traversal via `prev` pointers, respectively. Both **O(n)**.
+- **`displayBuffer()` / `displayReverse()`** — Forward via `next`, backward via `prev`. Both **O(n)**.
 
 ### 3.4 Standard Delivery — Queue (FIFO)
 
 **Purpose:** First-In, First-Out scheduling of packages for standard delivery processing.
 
-**Implementation details:**
+The `DeliveryQueue` class is backed by a **singly linked list** with `front` and `rear` pointers.
 
-The `DeliveryQueue` class is backed by a **singly linked list** with `front` and `rear` pointers plus a `size` counter.
-
-- **`enqueue(Package pkg)`** — If `rear == null`, both `front` and `rear` point to the new node. Otherwise, `rear.next` is linked to the new node and `rear` advances. **O(1)** via the `rear` pointer.
-
-- **`dequeue()`** — Saves `front.data`, advances `front` to `front.next`, and if the queue becomes empty (`front == null`), also nulls `rear`. **O(1)** direct pointer manipulation.
-
+- **`enqueue(Package pkg)`** — **O(1)** via the `rear` pointer.
+- **`dequeue()`** — **O(1)** direct pointer manipulation.
 - **`peek()`** — Returns `front.data` without mutation. **O(1)**.
 
 ### 3.5 Truck Loading — Stack (LIFO)
 
-**Purpose:** Last-In, First-Out loading of packages onto the delivery truck — the last package loaded is the first one unloaded at the destination.
+**Purpose:** Last-In, First-Out loading of packages onto the delivery truck.
 
-**Implementation details:**
+The `TruckStack` class is backed by a **singly linked list** using only a `top` pointer.
 
-The `TruckStack` class is backed by a **singly linked list** using only a `top` pointer and `size` counter.
-
-- **`push(Package pkg)`** — Creates a new node whose `next` points to the current `top`, then reassigns `top` to the new node. **O(1)**.
-
-- **`pop()`** — Saves `top.data`, advances `top` to `top.next`. **O(1)**.
-
+- **`push(Package pkg)`** — New node's `next` points to current `top`. **O(1)**.
+- **`pop()`** — Advances `top` to `top.next`. **O(1)**.
 - **`peek()`** — Returns `top.data` without removal. **O(1)**.
-
-- **`displayStack()`** — Traverses from `top` to `null` printing `[TOP]` and `[BOTTOM]` markers. **O(n)**.
 
 ### 3.6 Address Directory — AVL Tree
 
-**Purpose:** A self-balancing binary search tree that stores neighborhood names (as keys, compared lexicographically via `compareToIgnoreCase`) and associated customer IDs.
-
-**Implementation details:**
-
-The `AVLTree` class uses a private inner `AVLNode` with fields: `String neighborhood`, `String customerID`, `AVLNode left`, `AVLNode right`, and `int height` (initialized to 1 for leaf nodes).
+**Purpose:** A self-balancing binary search tree that stores Kayseri neighborhood names (keys, compared lexicographically) and associated customer IDs.
 
 #### Height & Balance Factor
 
 - **`height(AVLNode)`** returns `node.height` or 0 if null.
 - **`updateHeight(AVLNode)`** sets `node.height = 1 + max(height(left), height(right))`.
-- **`getBalanceFactor(AVLNode)`** returns `height(left) - height(right)`. A positive value indicates left-heavy; negative indicates right-heavy.
+- **`getBalanceFactor(AVLNode)`** returns `height(left) - height(right)`.
 
 #### Rotation Logic
-
-The implementation handles all four AVL imbalance cases:
 
 **Left Rotation (`rotateLeft(AVLNode x)`):**
 ```
@@ -216,7 +222,6 @@ The implementation handles all four AVL imbalance cases:
        / \            \
       B   C            B
 ```
-Node `y = x.right` becomes the new root; `x.right` is reassigned to `y.left` (subtree B). Heights are updated bottom-up: `x` first (now lower), then `y`.
 
 **Right Rotation (`rotateRight(AVLNode y)`):**
 ```
@@ -226,9 +231,8 @@ Node `y = x.right` becomes the new root; `x.right` is reassigned to `y.left` (su
      / \              /
     A   B            B
 ```
-Node `x = y.left` becomes the new root; `y.left` is reassigned to `x.right` (subtree B). Heights updated: `y` first, then `x`.
 
-**`balance(AVLNode node)`** — Computes the balance factor and applies:
+**`balance(AVLNode node)`** handles all four cases:
 
 | Case | Condition | Action |
 |------|-----------|--------|
@@ -237,76 +241,39 @@ Node `x = y.left` becomes the new root; `y.left` is reassigned to `x.right` (sub
 | **RR** | `bf < -1` and `bf(right) <= 0` | Single left rotation |
 | **RL** | `bf < -1` and `bf(right) > 0` | Right-rotate right child, then left-rotate node |
 
-#### Insertion
-
-**`insert(String neighborhood, String customerID)`** delegates to `insertRec()`, which:
-1. Recursively descends using `compareToIgnoreCase()` — left if negative, right if positive.
-2. On duplicate key (comparison == 0), updates the existing `customerID` in-place and decrements `nodeCount` to offset the public method's increment.
-3. On the way back up the recursion stack, calls `updateHeight()` and then `balance()` on every ancestor, ensuring the tree remains balanced after every insertion.
-
-#### Search
-
-**`search(String neighborhood)`** delegates to `searchRec()`, which recursively compares and descends left or right. The AVL invariant guarantees the tree height is at most `1.44 * log₂(n)`, so search operates in **O(log n)**.
-
-#### Traversals
-
-- **`inOrderTraversal()`** — Recursive left-root-right traversal that outputs neighborhoods in alphabetical order with heights.
-- **`printTree()`** — Recursive pretty-printer that visualizes the tree structure with `├──` and `└──` branch characters.
-
 ### 3.7 City Map & Routing — Weighted Graph
 
-**Purpose:** Models the city's road network as a weighted, undirected graph. Vertices represent neighborhoods; edges represent roads with distances in kilometres.
-
-**Implementation details:**
-
-The `CityGraph` class uses **arrays** and **manually linked edge nodes** — no `HashMap` or `ArrayList`.
+**Purpose:** Models Kayseri's road network as a weighted, undirected graph. Merkez depo: **Meydan**. Semtler: Alpaslan, Talas, Erkilet, Belsin, İldem, Mimsin, Anbar, Kocasinan.
 
 **Internal representation:**
 - `String[] vertexNames` — maps integer index → location name (capacity: 100).
-- `EdgeNode[] adjacencyList` — array of linked-list heads; each `EdgeNode` has `int destIndex`, `int weight`, and `EdgeNode next`.
+- `EdgeNode[] adjacencyList` — array of linked-list heads.
 - `int vertexCount` — tracks the number of vertices added.
-
-#### Edge Management
-
-**`addEdge(String source, String destination, int weight)`:**
-1. Calls `getOrCreateVertexIndex()` for both endpoints — this method performs a linear scan of `vertexNames[0..vertexCount-1]`; if not found, appends a new vertex.
-2. Creates two `EdgeNode` objects (undirected graph) and prepends each to the corresponding adjacency list via head insertion (`newEdge.next = adjacencyList[idx]`).
 
 #### Dijkstra's Algorithm — `calculateShortestPath(String start, String end)`
 
-The implementation uses the **O(V²) array-scanning variant** (no binary heap):
+O(V²) array-scanning variant:
 
-1. **Initialization:** `dist[]` array set to `Integer.MAX_VALUE`; `prev[]` set to `-1`; `visited[]` set to `false`. Source distance set to 0.
+1. `dist[]` initialized to `Integer.MAX_VALUE`; source distance set to 0.
+2. Main loop: find unvisited vertex `u` with smallest `dist[u]` — **O(V)** per iteration.
+3. Relaxation: for each neighbor `v`, if `dist[u] + weight < dist[v]`, update `dist[v]` and `prev[v]`.
+4. Path reconstruction via `prev[]` array.
 
-2. **Main loop** (runs `vertexCount` iterations):
-   - Scans all vertices to find the unvisited vertex `u` with smallest `dist[u]` — **O(V)** per iteration.
-   - Marks `u` as visited.
-   - **Relaxation:** Traverses `u`'s adjacency list; for each neighbor `v`, if `dist[u] + weight < dist[v]`, updates `dist[v]` and sets `prev[v] = u`.
-
-3. **Path reconstruction:** Traces `prev[]` from the destination back to the source, collecting vertex names into an array, then prints the path in forward order along with step-by-step edge weights.
-
-**Total complexity:** O(V²) for the min-extraction loop × V iterations, plus O(E) total for all edge relaxations across all iterations = **O(V² + E)** = **O(V²)** since E ≤ V² for simple graphs.
+**Total complexity: O(V²)**
 
 #### Prim's Algorithm — `calculateMST()`
 
-The implementation also uses the **O(V²) array-scanning variant:**
+Same O(V²) structure:
 
-1. **Initialization:** `key[]` (minimum edge weight connecting vertex to MST) set to `Integer.MAX_VALUE`; `parent[]` set to `-1`; `inMST[]` set to `false`. `key[0] = 0` to start from vertex 0.
+1. `key[]` initialized to `Integer.MAX_VALUE`; `key[0] = 0`.
+2. Main loop: find min `key[i]` not in MST — **O(V)** per iteration.
+3. Update neighbor keys; accumulate `totalWeight`.
 
-2. **Main loop** (runs `vertexCount` iterations):
-   - Scans all vertices for the minimum `key[i]` among those not yet in the MST — **O(V)** per iteration.
-   - Adds vertex `u` to the MST, accumulates `totalWeight += key[u]`.
-   - Traverses `u`'s adjacency list; for each neighbor `v` not in MST, if `edge.weight < key[v]`, updates `key[v]` and `parent[v]`.
-
-3. **Output:** Prints all MST edges (`parent[i] → i` with `key[i]` as weight) and the total MST weight.
-
-**Total complexity:** Same structure as Dijkstra — **O(V²)**.
+**Total complexity: O(V²)**
 
 ---
 
 ## 4. Complexity Analysis
-
-The following table presents the exact time and space complexities for all major operations, justified strictly by the code implementation.
 
 ### 4.1 Linear Data Structure Operations
 
@@ -329,12 +296,12 @@ The following table presents the exact time and space complexities for all major
 
 | Operation | Structure | Best Case | Worst Case | Space | Justification |
 |-----------|-----------|-----------|------------|-------|---------------|
-| `insert(nbhd, cid)` | AVL Tree | **O(log n)** | **O(log n)** | O(log n) | AVL self-balancing guarantees height ≤ 1.44·log₂(n). Recursive descent + at most 2 rotations on the return path. Space: recursive call stack depth = O(log n). |
-| `search(nbhd)` | AVL Tree | **O(1)** | **O(log n)** | O(log n) | Best: root match. Worst: leaf-level or absent. Space: recursion depth = O(log n). |
-| `inOrderTraversal()` | AVL Tree | **O(n)** | **O(n)** | O(log n) | Visits every node exactly once. Recursion stack bounded by tree height. |
-| `balance(node)` | AVL Tree | **O(1)** | **O(1)** | O(1) | Computes balance factor + at most 2 rotations; each rotation is O(1) pointer reassignment. |
-| `rotateLeft(x)` | AVL Tree | **O(1)** | **O(1)** | O(1) | Three pointer reassignments + two `updateHeight()` calls. |
-| `rotateRight(y)` | AVL Tree | **O(1)** | **O(1)** | O(1) | Three pointer reassignments + two `updateHeight()` calls. |
+| `insert(nbhd, cid)` | AVL Tree | **O(log n)** | **O(log n)** | O(log n) | AVL self-balancing guarantees height ≤ 1.44·log₂(n). |
+| `search(nbhd)` | AVL Tree | **O(1)** | **O(log n)** | O(log n) | Best: root match. Worst: leaf-level or absent. |
+| `inOrderTraversal()` | AVL Tree | **O(n)** | **O(n)** | O(log n) | Visits every node exactly once. |
+| `balance(node)` | AVL Tree | **O(1)** | **O(1)** | O(1) | At most 2 rotations; each O(1). |
+| `rotateLeft(x)` | AVL Tree | **O(1)** | **O(1)** | O(1) | Three pointer reassignments + two `updateHeight()`. |
+| `rotateRight(y)` | AVL Tree | **O(1)** | **O(1)** | O(1) | Three pointer reassignments + two `updateHeight()`. |
 
 ### 4.3 Graph Algorithm Operations
 
@@ -342,19 +309,19 @@ Let V = number of vertices, E = number of edges.
 
 | Operation | Algorithm | Best Case | Worst Case | Space | Justification |
 |-----------|-----------|-----------|------------|-------|---------------|
-| `addEdge(s, d, w)` | — | **O(1)** | **O(V)** | O(1) | `getOrCreateVertexIndex()` scans `vertexNames[0..V-1]`; edge insertion itself is O(1) head-prepend. Best case: both vertices already at index 0. |
-| `calculateShortestPath(s, e)` | Dijkstra | **O(V²)** | **O(V²)** | O(V) | Outer loop runs V times; inner min-scan is O(V); edge relaxation totals O(E) across all iterations. `dist[]`, `prev[]`, `visited[]`: 3 arrays of size V. Path reconstruction: O(V). |
-| `calculateMST()` | Prim | **O(V²)** | **O(V²)** | O(V) | Identical structure to Dijkstra: V iterations × O(V) min-scan. `key[]`, `parent[]`, `inMST[]`: 3 arrays of size V. |
-| `displayGraph()` | — | **O(V + E)** | **O(V + E)** | O(1) | Iterates every vertex and every edge in the adjacency lists. |
+| `addEdge(s, d, w)` | — | **O(1)** | **O(V)** | O(1) | `getOrCreateVertexIndex()` scans up to V names. |
+| `calculateShortestPath(s, e)` | Dijkstra | **O(V²)** | **O(V²)** | O(V) | V iterations × O(V) min-scan + O(E) relaxations. |
+| `calculateMST()` | Prim | **O(V²)** | **O(V²)** | O(V) | Identical structure to Dijkstra. |
+| `displayGraph()` | — | **O(V + E)** | **O(V + E)** | O(1) | Iterates every vertex and every edge. |
 
 ### 4.4 Overall Space Complexity
 
 | Structure | Space Complexity | Note |
 |-----------|-----------------|------|
-| SLL (Master Registry) | **O(n)** | One `Node` per package; each node stores a reference + next pointer |
-| DLL (Intake Buffer) | **O(n)** | One `Node` per package; each node stores reference + prev + next |
-| Queue | **O(n)** | Singly-linked nodes with front/rear pointers |
-| Stack | **O(n)** | Singly-linked nodes with top pointer |
+| SLL (Master Registry) | **O(n)** | One `Node` per package |
+| DLL (Intake Buffer) | **O(n)** | One `Node` per package |
+| Queue | **O(n)** | Singly-linked nodes |
+| Stack | **O(n)** | Singly-linked nodes |
 | AVL Tree | **O(n)** | One `AVLNode` per unique neighborhood |
 | Graph | **O(V + E)** | Vertex name array + adjacency list edge nodes |
 
@@ -368,34 +335,30 @@ The system reads two external text files at startup using `java.io.BufferedReade
 
 **Format:** `Source Destination Distance_KM` (whitespace-delimited, one edge per line)
 
-Each line is split via `line.split("\\s+")`. The parsed source, destination, and integer distance are passed to `cityMap.addEdge()`. Lines starting with `#` or that are empty are skipped. The system loaded **15 edges** connecting **8 vertices** in the demonstration dataset (Istanbul neighborhoods: Warehouse, Kadikoy, Besiktas, Uskudar, Bakirkoy, Sisli, Fatih, Beyoglu).
+Merkez depo **Meydan**'dan hareketle Kayseri semtleri (Alpaslan, Talas, Erkilet, Belsin, İldem, Mimsin, Anbar, Kocasinan) arasındaki 15 kenar yüklenmektedir. Yorum satırları `#` ile başlar ve atlanır.
 
 ### `packageData.txt`
 
 **Format:** `PackageID Destination` (whitespace-delimited, one package per line)
 
-Each line creates a `Package` object using the simplified two-argument constructor, which is then:
-1. Registered in the **Master Registry** via `masterRegistry.addRecord(pkg)` — SLL append
-2. Added to the **Intake Buffer** via `intakeBuffer.insertAtTail(pkg)` — DLL tail insert
-3. Indexed in the **Address Directory** via `addressDirectory.insert(destination, packageID)` — AVL insert
+Format: `PKG_KYS_XXX`. Her satır okunduğunda:
+1. **Master Registry**'e `addRecord(pkg)` ile eklenir (SLL)
+2. **Intake Buffer**'a `insertAtTail(pkg)` ile eklenir (DLL)
+3. **Address Directory**'e `insert(destination, packageID)` ile eklenir (AVL)
 
-The demonstration dataset contains **12 packages** destined for 7 unique neighborhoods.
-
-Both file readers use try-with-resources for automatic stream closure and handle `IOException` and `NumberFormatException` gracefully.
+Demonstrasyon veri seti **12 paket** ve Kayseri'nin 7 farklı semtini kapsamaktadır.
 
 ---
 
 ## 6. Conclusion
 
-The Veteran Urban Logistics & Distribution System demonstrates a complete, end-to-end application of fundamental and advanced data structures to solve a real-world logistics problem. Every data structure — Singly Linked List, Doubly Linked List, Queue, Stack, AVL Tree, and Weighted Graph — was implemented manually from scratch in strict adherence to Object-Oriented Programming principles, without relying on Java's built-in collection framework.
+The Veteran Urban Logistics & Distribution System demonstrates a complete, end-to-end application of fundamental and advanced data structures to solve a real-world logistics problem for the city of Kayseri. Every data structure — Singly Linked List, Doubly Linked List, Queue, Stack, AVL Tree, and Weighted Graph — was implemented manually from scratch without relying on Java's built-in collection framework.
 
 The system achieves the following performance guarantees:
 
 - **O(1)** amortized insertion and removal for all linear structures (SLL append, DLL head/tail operations, Queue enqueue/dequeue, Stack push/pop), enabled by the deliberate use of `head`, `tail`, `front`, `rear`, and `top` pointers.
 - **O(log n)** guaranteed search and insertion in the Address Directory, thanks to the AVL tree's self-balancing rotations that maintain height within 1.44·log₂(n).
-- **O(V²)** shortest-path and minimum spanning tree computations via Dijkstra's and Prim's algorithms, appropriate for the moderate-scale city maps typical of urban logistics.
-
-The mathematical modelling choices — greedy relaxation in Dijkstra's algorithm, the cut property in Prim's algorithm, and the balance invariant in the AVL tree — are all well-established and provably optimal within their respective problem domains. The system's modular architecture allows each subsystem to be tested, extended, or replaced independently, making it a robust foundation for real-world urban logistics optimization.
+- **O(V²)** shortest-path and minimum spanning tree computations via Dijkstra's and Prim's algorithms, appropriate for Kayseri's urban road network.
 
 ---
 
