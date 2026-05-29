@@ -1,12 +1,14 @@
-PKG-001 Kadikoy
-PKG-002 Besiktas
-PKG-003 Uskudar
-PKG-004 Fatih
-PKG-005 Sisli
-PKG-006 Bakirkoy
-PKG-007 Beyoglu
-PKG-008 Kadikoy
-PKG-009 Fatih
-PKG-010 Besiktas
-PKG-011 Uskudar
-PKG-012 Sisli
+# PackageID Destination
+# Her paket Meydan deposundan ilgili Kayseri semtine teslim edilecektir.
+PKG_KYS_001 Talas
+PKG_KYS_002 Belsin
+PKG_KYS_003 Ildem
+PKG_KYS_004 Anbar
+PKG_KYS_005 Erkilet
+PKG_KYS_006 Mimsin
+PKG_KYS_007 Alpaslan
+PKG_KYS_008 Talas
+PKG_KYS_009 Belsin
+PKG_KYS_010 Kocasinan
+PKG_KYS_011 Ildem
+PKG_KYS_012 Erkilet
