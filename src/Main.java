@@ -29,7 +29,7 @@ import java.util.Scanner;
  * ║            ╚═╝  ╚═╝ ╚═════╝  ╚═════╝    ╚═╝   ╚══════╝             ║
  * ║                                                                    ║
  * ║        Urban Logistics & Distribution System  v1.0                 ║
- * ║        Kayseri Sehir Ici Dagitim ve Lojistik Yonetimi             ║
+ * ║        Kayseri Urban Delivery & Logistics Management              ║
  * ║        Mission: Optimize urban package delivery using              ║
  * ║                 advanced data structures & graph algorithms.       ║
  * ╚══════════════════════════════════════════════════════════════════════╝
@@ -72,7 +72,7 @@ public class Main {
 
         // ── Step 1: Load external data ──────────────────────────
         System.out.println();
-        printSectionHeader("PHASE 1 — VERI YUKLEMESI (DATA INGESTION)");
+        printSectionHeader("PHASE 1 — DATA INGESTION");
         loadMapData();
         loadPackageData();
 
@@ -80,7 +80,7 @@ public class Main {
         boolean running = true;
         while (running) {
             printMenu();
-            System.out.print("  [" + COMPANY_NAME + "] Secim yapiniz ▸ ");
+            System.out.print("  [" + COMPANY_NAME + "] Make a choice ▸ ");
             String choice = scanner.nextLine().trim();
 
             switch (choice) {
@@ -124,7 +124,7 @@ public class Main {
                     running = false;
                     break;
                 default:
-                    System.out.println("  ⚠ Gecersiz secim. Lutfen tekrar deneyin.");
+                    System.out.println("  ⚠ Invalid choice. Please try again.");
             }
         }
 
@@ -139,10 +139,10 @@ public class Main {
     /**
      * Reads mapData.txt and populates the CityGraph.
      * Expected format per line: Source Destination Distance_KM
-     * Merkez depo: Meydan (Kayseri)
+     * Central depot: Meydan (Kayseri)
      */
     private static void loadMapData() {
-        System.out.println("\n  ▶ Kayseri sehir haritasi yukleniyor: " + MAP_DATA_FILE);
+        System.out.println("\n  ▶ Loading Kayseri city map: " + MAP_DATA_FILE);
         int edgeCount = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(MAP_DATA_FILE))) {
             String line;
@@ -159,12 +159,12 @@ public class Main {
                     edgeCount++;
                 }
             }
-            System.out.printf("    ✔ %d kenar, %d kosegeden olusan harita yuklendi.%n",
+            System.out.printf("    ✔ Map loaded: %d edges, %d vertices.%n",
                     edgeCount, cityMap.getVertexCount());
         } catch (IOException e) {
-            System.out.println("    ✘ Harita verisi okunamadi: " + e.getMessage());
+            System.out.println("    ✘ Could not read map data: " + e.getMessage());
         } catch (NumberFormatException e) {
-            System.out.println("    ✘ Gecersiz mesafe formati: " + e.getMessage());
+            System.out.println("    ✘ Invalid distance format: " + e.getMessage());
         }
     }
 
@@ -177,7 +177,7 @@ public class Main {
      * Expected format per line: PackageID Destination
      */
     private static void loadPackageData() {
-        System.out.println("\n  ▶ Kayseri paket verileri yukleniyor: " + PACKAGE_DATA_FILE);
+        System.out.println("\n  ▶ Loading Kayseri package data: " + PACKAGE_DATA_FILE);
         int count = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(PACKAGE_DATA_FILE))) {
             String line;
@@ -203,9 +203,9 @@ public class Main {
                     count++;
                 }
             }
-            System.out.printf("    ✔ %d paket basariyla yuklendi.%n", count);
+            System.out.printf("    ✔ %d packages loaded successfully.%n", count);
         } catch (IOException e) {
-            System.out.println("    ✘ Paket verisi okunamadi: " + e.getMessage());
+            System.out.println("    ✘ Could not read package data: " + e.getMessage());
         }
     }
 
@@ -215,31 +215,31 @@ public class Main {
 
     /** Option 1: Display Master Registry (SLL) */
     private static void showMasterRegistry() {
-        printSectionHeader("ANA KAYIT DEFTERI (Singly Linked List)");
-        System.out.println("  Toplam kayit: " + masterRegistry.getSize());
+        printSectionHeader("MASTER REGISTRY (Singly Linked List)");
+        System.out.println("  Total records: " + masterRegistry.getSize());
         masterRegistry.displayLog();
         printDivider();
     }
 
     /** Option 2: Display Intake Buffer (DLL) */
     private static void showIntakeBuffer() {
-        printSectionHeader("GIRIS TAMPONU (Doubly Linked List)");
-        System.out.println("  Tampondaki paket sayisi: " + intakeBuffer.getSize());
-        System.out.println("\n  [Bas → Son]:");
+        printSectionHeader("INTAKE BUFFER (Doubly Linked List)");
+        System.out.println("  Packages in buffer: " + intakeBuffer.getSize());
+        System.out.println("\n  [Head → Tail]:");
         intakeBuffer.displayBuffer();
-        System.out.println("\n  [Son → Bas] (ters):");
+        System.out.println("\n  [Tail → Head] (reverse):");
         intakeBuffer.displayReverse();
         printDivider();
     }
 
     /** Option 3: Delivery Queue operations */
     private static void processDeliveryQueue(Scanner scanner) {
-        printSectionHeader("STANDART TESLIMAT KUYRUGU (FIFO Queue)");
+        printSectionHeader("STANDARD DELIVERY QUEUE (FIFO Queue)");
 
-        System.out.println("  [1] Tamponden kuyruga paket aktar");
-        System.out.println("  [2] Kuyruktan paket al (dequeue)");
-        System.out.println("  [3] Kuyrugu goruntule");
-        System.out.print("  Secim ▸ ");
+        System.out.println("  [1] Move packages from buffer to queue");
+        System.out.println("  [2] Dequeue a package");
+        System.out.println("  [3] Display queue");
+        System.out.print("  Choice ▸ ");
         String sub = scanner.nextLine().trim();
 
         switch (sub) {
@@ -252,32 +252,32 @@ public class Main {
                         moved++;
                     }
                 }
-                System.out.printf("  ✔ %d paket tamponden kuyruga aktarildi.%n", moved);
+                System.out.printf("  ✔ %d packages moved from buffer to queue.%n", moved);
                 break;
             case "2":
                 Package dequeued = deliveryQueue.dequeue();
                 if (dequeued != null) {
-                    System.out.println("  ✔ Kuyruktan alindi: " + dequeued);
+                    System.out.println("  ✔ Dequeued: " + dequeued);
                 }
                 break;
             case "3":
-                System.out.println("  Kuyruk icerigi (on → arka):");
+                System.out.println("  Queue contents (front → rear):");
                 deliveryQueue.displayQueue();
                 break;
             default:
-                System.out.println("  ⚠ Gecersiz secim.");
+                System.out.println("  ⚠ Invalid choice.");
         }
         printDivider();
     }
 
     /** Option 4: Truck Stack operations */
     private static void processTruckLoading(Scanner scanner) {
-        printSectionHeader("ARAC YUKLEME ALANI (LIFO Stack)");
+        printSectionHeader("TRUCK LOADING BAY (LIFO Stack)");
 
-        System.out.println("  [1] Kuyruktan araca paket yukle");
-        System.out.println("  [2] Aractan ust paketi indir (pop)");
-        System.out.println("  [3] Arac yuk durumunu goruntule");
-        System.out.print("  Secim ▸ ");
+        System.out.println("  [1] Load packages from queue onto truck");
+        System.out.println("  [2] Unload top package (pop)");
+        System.out.println("  [3] Display truck load");
+        System.out.print("  Choice ▸ ");
         String sub = scanner.nextLine().trim();
 
         switch (sub) {
@@ -290,91 +290,91 @@ public class Main {
                         loaded++;
                     }
                 }
-                System.out.printf("  ✔ %d paket araca yuklendi.%n", loaded);
+                System.out.printf("  ✔ %d packages loaded onto truck.%n", loaded);
                 break;
             case "2":
                 Package popped = truckStack.pop();
                 if (popped != null) {
-                    System.out.println("  ✔ Aractan indirildi: " + popped);
+                    System.out.println("  ✔ Unloaded: " + popped);
                 }
                 break;
             case "3":
-                System.out.println("  Arac yuk durumu:");
+                System.out.println("  Truck load:");
                 truckStack.displayStack();
                 break;
             default:
-                System.out.println("  ⚠ Gecersiz secim.");
+                System.out.println("  ⚠ Invalid choice.");
         }
         printDivider();
     }
 
     /** Option 5: Address Directory (AVL Tree) */
     private static void showAddressDirectory(Scanner scanner) {
-        printSectionHeader("ADRES REHBERI (AVL Tree)");
+        printSectionHeader("ADDRESS DIRECTORY (AVL Tree)");
 
-        System.out.println("  [1] Rehberi goruntule (siralı)");
-        System.out.println("  [2] Agac yapisini goruntule");
-        System.out.println("  [3] Semt ara");
-        System.out.println("  [4] Yeni kayit ekle");
-        System.out.print("  Secim ▸ ");
+        System.out.println("  [1] Display directory (sorted)");
+        System.out.println("  [2] Display tree structure");
+        System.out.println("  [3] Search district");
+        System.out.println("  [4] Add new record");
+        System.out.print("  Choice ▸ ");
         String sub = scanner.nextLine().trim();
 
         switch (sub) {
             case "1":
-                System.out.println("  Sirali rehber (" + addressDirectory.getNodeCount()
-                        + " kayit, agac yuksekligi = " + addressDirectory.getTreeHeight() + "):");
+                System.out.println("  Sorted directory (" + addressDirectory.getNodeCount()
+                        + " records, tree height = " + addressDirectory.getTreeHeight() + "):");
                 addressDirectory.inOrderTraversal();
                 break;
             case "2":
-                System.out.println("  Agac yapisi:");
+                System.out.println("  Tree structure:");
                 addressDirectory.printTree();
                 break;
             case "3":
-                System.out.print("  Semt adi giriniz ▸ ");
+                System.out.print("  Enter district name ▸ ");
                 String searchKey = scanner.nextLine().trim();
                 String result = addressDirectory.search(searchKey);
                 if (result != null) {
-                    System.out.println("  ✔ Bulundu: " + searchKey + " → Musteri: " + result);
+                    System.out.println("  ✔ Found: " + searchKey + " → Customer: " + result);
                 } else {
-                    System.out.println("  ✘ Semt bulunamadi: '" + searchKey + "'");
+                    System.out.println("  ✘ District not found: '" + searchKey + "'");
                 }
                 break;
             case "4":
-                System.out.print("  Semt adi ▸ ");
+                System.out.print("  District name ▸ ");
                 String neighborhood = scanner.nextLine().trim();
-                System.out.print("  Musteri ID  ▸ ");
+                System.out.print("  Customer ID  ▸ ");
                 String custID = scanner.nextLine().trim();
                 addressDirectory.insert(neighborhood, custID);
-                System.out.println("  ✔ Eklendi: " + neighborhood + " → " + custID);
+                System.out.println("  ✔ Added: " + neighborhood + " → " + custID);
                 break;
             default:
-                System.out.println("  ⚠ Gecersiz secim.");
+                System.out.println("  ⚠ Invalid choice.");
         }
         printDivider();
     }
 
     /** Option 6: Display City Map */
     private static void showCityMap() {
-        printSectionHeader("KAYSERI SEHIR HARITASI (Weighted Graph — Adjacency List)");
-        System.out.println("  Merkez Depo: Meydan");
-        System.out.println("  Kosegen sayisi: " + cityMap.getVertexCount());
+        printSectionHeader("KAYSERI CITY MAP (Weighted Graph — Adjacency List)");
+        System.out.println("  Central Depot: Meydan");
+        System.out.println("  Vertex count: " + cityMap.getVertexCount());
         cityMap.displayGraph();
         printDivider();
     }
 
     /** Option 7: Find Shortest Path (Dijkstra) */
     private static void findShortestPath(Scanner scanner) {
-        printSectionHeader("EN KISA YOL — Dijkstra Algoritmasi");
+        printSectionHeader("SHORTEST PATH — Dijkstra's Algorithm");
 
-        System.out.println("  Mevcut konumlar:");
+        System.out.println("  Available locations:");
         String[] names = cityMap.getVertexNames();
         for (int i = 0; i < names.length; i++) {
             System.out.printf("    [%d] %s%n", i + 1, names[i]);
         }
 
-        System.out.print("  BASLANGIC konumu giriniz ▸ ");
+        System.out.print("  Enter START location ▸ ");
         String start = scanner.nextLine().trim();
-        System.out.print("  BITIS konumu giriniz     ▸ ");
+        System.out.print("  Enter END location   ▸ ");
         String end = scanner.nextLine().trim();
 
         System.out.println();
@@ -384,52 +384,52 @@ public class Main {
 
     /** Option 8: Compute MST (Prim's) */
     private static void computeMST() {
-        printSectionHeader("MINIMUM YAYILAN AGAC — Prim Algoritmasi");
+        printSectionHeader("MINIMUM SPANNING TREE — Prim's Algorithm");
         cityMap.calculateMST();
         printDivider();
     }
 
     /** Option 9: Full automated demo */
     private static void runFullDemo() {
-        printSectionHeader("TAM SISTEM DEMONSTRASYONU");
-        System.out.println("  " + COMPANY_NAME + " tum alt sistemleri calistiriliyor...\n");
+        printSectionHeader("FULL SYSTEM DEMONSTRATION");
+        System.out.println("  Running all " + COMPANY_NAME + " subsystems...\n");
 
         // ── 1. Master Registry (SLL) ────────────────────────────
-        printSubSection("1. ANA KAYIT DEFTERI (Singly Linked List)");
-        System.out.println("  Sisteme giren tum paketler:");
+        printSubSection("1. MASTER REGISTRY (Singly Linked List)");
+        System.out.println("  All packages entering the system:");
         masterRegistry.displayLog();
 
-        System.out.println("\n  PKG_KYS_005 aranıyor:");
+        System.out.println("\n  Searching for PKG_KYS_005:");
         Package found = masterRegistry.search("PKG_KYS_005");
         if (found != null) {
-            System.out.println("    ✔ Bulundu: " + found);
+            System.out.println("    ✔ Found: " + found);
         } else {
-            System.out.println("    ✘ Bulunamadi.");
+            System.out.println("    ✘ Not found.");
         }
 
         // ── 2. Intake Buffer (DLL) ─────────────────────────────
-        printSubSection("2. GIRIS TAMPONU (Doubly Linked List)");
+        printSubSection("2. INTAKE BUFFER (Doubly Linked List)");
 
         if (intakeBuffer.isEmpty()) {
-            System.out.println("  Demo icin tampon yeniden dolduruluyor...");
+            System.out.println("  Refilling buffer for demo...");
             intakeBuffer.insertAtTail(new Package("PKG_KYS_013", "Talas"));
             intakeBuffer.insertAtTail(new Package("PKG_KYS_014", "Belsin"));
             intakeBuffer.insertAtTail(new Package("PKG_KYS_015", "Erkilet"));
             intakeBuffer.insertAtHead(new Package("PKG_KYS_URGENT", "Meydan", 1, 0.5));
-            System.out.println("  3 paket sona, 1 acil paket basa eklendi.");
+            System.out.println("  3 packages added to tail, 1 urgent package to head.");
         }
-        System.out.println("\n  Tampon icerigi (Bas → Son):");
+        System.out.println("\n  Buffer contents (Head → Tail):");
         intakeBuffer.displayBuffer();
-        System.out.println("\n  Bastan paket kaldiriliyor:");
+        System.out.println("\n  Removing package from head:");
         Package removedHead = intakeBuffer.removeFromHead();
         if (removedHead != null) {
-            System.out.println("    Kaldirildi: " + removedHead);
+            System.out.println("    Removed: " + removedHead);
         }
-        System.out.println("  Kaldirma sonrasi tampon:");
+        System.out.println("  Buffer after removal:");
         intakeBuffer.displayBuffer();
 
         // ── 3. Delivery Queue (FIFO) ───────────────────────────
-        printSubSection("3. TESLIMAT KUYRUGU (FIFO Queue)");
+        printSubSection("3. DELIVERY QUEUE (FIFO Queue)");
         int enqueued = 0;
         while (!intakeBuffer.isEmpty()) {
             Package pkg = intakeBuffer.removeFromHead();
@@ -438,20 +438,20 @@ public class Main {
                 enqueued++;
             }
         }
-        System.out.printf("  %d paket tamponden kuyruga aktarildi.%n", enqueued);
-        System.out.println("  Kuyruk icerigi (on → arka):");
+        System.out.printf("  %d packages moved from buffer to queue.%n", enqueued);
+        System.out.println("  Queue contents (front → rear):");
         deliveryQueue.displayQueue();
 
-        System.out.println("\n  On paket kuyruktan aliniyor:");
+        System.out.println("\n  Dequeuing front package:");
         Package dq = deliveryQueue.dequeue();
         if (dq != null) {
-            System.out.println("    Alindi: " + dq);
+            System.out.println("    Dequeued: " + dq);
         }
-        System.out.println("  Islem sonrasi kuyruk:");
+        System.out.println("  Queue after operation:");
         deliveryQueue.displayQueue();
 
         // ── 4. Truck Stack (LIFO) ──────────────────────────────
-        printSubSection("4. ARAC YUKLEME (LIFO Stack)");
+        printSubSection("4. TRUCK LOADING (LIFO Stack)");
         int loaded = 0;
         while (!deliveryQueue.isEmpty()) {
             Package pkg = deliveryQueue.dequeue();
@@ -460,130 +460,130 @@ public class Main {
                 loaded++;
             }
         }
-        System.out.printf("  %d paket araca yuklendi.%n", loaded);
-        System.out.println("  Arac yuk durumu:");
+        System.out.printf("  %d packages loaded onto truck.%n", loaded);
+        System.out.println("  Truck load:");
         truckStack.displayStack();
 
-        System.out.println("\n  Teslimat noktasinda paketler indiriliyor (LIFO sirasi):");
+        System.out.println("\n  Unloading packages at delivery point (LIFO order):");
         while (!truckStack.isEmpty()) {
             Package p = truckStack.pop();
-            System.out.println("    📦 Teslim edildi: " + p);
+            System.out.println("    📦 Delivered: " + p);
         }
 
         // ── 5. Address Directory (AVL Tree) ────────────────────
-        printSubSection("5. ADRES REHBERI (AVL Tree)");
-        System.out.println("  Kayit sayisi: " + addressDirectory.getNodeCount()
-                + " | Agac yuksekligi: " + addressDirectory.getTreeHeight());
-        System.out.println("\n  In-order gezinme (alfabetik sirada semtler):");
+        printSubSection("5. ADDRESS DIRECTORY (AVL Tree)");
+        System.out.println("  Record count: " + addressDirectory.getNodeCount()
+                + " | Tree height: " + addressDirectory.getTreeHeight());
+        System.out.println("\n  In-order traversal (districts alphabetically):");
         addressDirectory.inOrderTraversal();
-        System.out.println("\n  Agac yapisi:");
+        System.out.println("\n  Tree structure:");
         addressDirectory.printTree();
 
-        String[] searchTerms = {"Talas", "Erkilet", "Anbar", "YokSemt"};
-        System.out.println("\n  Arama demonstrasyonu:");
+        String[] searchTerms = {"Talas", "Erkilet", "Anbar", "NoSuchDistrict"};
+        System.out.println("\n  Search demonstration:");
         for (String term : searchTerms) {
             String res = addressDirectory.search(term);
             if (res != null) {
-                System.out.printf("    ✔ '%s' → Musteri: %s%n", term, res);
+                System.out.printf("    ✔ '%s' → Customer: %s%n", term, res);
             } else {
-                System.out.printf("    ✘ '%s' → BULUNAMADI%n", term);
+                System.out.printf("    ✘ '%s' → NOT FOUND%n", term);
             }
         }
 
         // ── 6. City Map (Graph) ────────────────────────────────
-        printSubSection("6. KAYSERI SEHIR HARITASI (Weighted Graph)");
-        System.out.println("  Komsuluk listesi gosterimi:");
+        printSubSection("6. KAYSERI CITY MAP (Weighted Graph)");
+        System.out.println("  Adjacency list view:");
         cityMap.displayGraph();
 
         // ── 7. Dijkstra's Algorithm ────────────────────────────
-        printSubSection("7. EN KISA YOL — Dijkstra Algoritmasi");
-        System.out.println("  Rota: Meydan → Mimsin");
+        printSubSection("7. SHORTEST PATH — Dijkstra's Algorithm");
+        System.out.println("  Route: Meydan → Mimsin");
         cityMap.calculateShortestPath("Meydan", "Mimsin");
         System.out.println();
-        System.out.println("  Rota: Meydan → Anbar");
+        System.out.println("  Route: Meydan → Anbar");
         cityMap.calculateShortestPath("Meydan", "Anbar");
 
         // ── 8. Prim's MST ──────────────────────────────────────
-        printSubSection("8. MINIMUM YAYILAN AGAC — Prim Algoritmasi");
+        printSubSection("8. MINIMUM SPANNING TREE — Prim's Algorithm");
         cityMap.calculateMST();
 
         System.out.println();
         printDivider();
-        System.out.println("  ✔ Tam demonstrasyon tamamlandi.");
-        System.out.println("    " + COMPANY_NAME + " tum alt sistemleri calisiyor.");
+        System.out.println("  ✔ Full demonstration complete.");
+        System.out.println("    All " + COMPANY_NAME + " subsystems operational.");
         printDivider();
     }
 
-    /** Option 10: Manuel Paket Ekleme */
+    /** Option 10: Add a package manually */
     private static void addNewPackage(Scanner scanner) {
-        printSectionHeader("YENI PAKET EKLEME");
-        System.out.print("  Paket ID giriniz (orn. PKG_KYS_099) ▸ ");
+        printSectionHeader("ADD NEW PACKAGE");
+        System.out.print("  Enter Package ID (e.g. PKG_KYS_099) ▸ ");
         String pkgID = scanner.nextLine().trim();
-        System.out.print("  Hedef Semt giriniz ▸ ");
+        System.out.print("  Enter Destination District ▸ ");
         String dest = scanner.nextLine().trim();
 
         if (!pkgID.isEmpty() && !dest.isEmpty()) {
             Package newPkg = new Package(pkgID, dest);
 
-            masterRegistry.addRecord(newPkg); // SLL'ye ekler
-            intakeBuffer.insertAtTail(newPkg); // DLL'ye ekler
-            addressDirectory.insert(dest, pkgID); // AVL Tree'ye ekler
+            masterRegistry.addRecord(newPkg);      // add to SLL
+            intakeBuffer.insertAtTail(newPkg);     // add to DLL
+            addressDirectory.insert(dest, pkgID);  // add to AVL Tree
 
-            System.out.println("  ✔ Paket sisteme basariyla eklendi: " + newPkg);
+            System.out.println("  ✔ Package added to system successfully: " + newPkg);
         } else {
-            System.out.println("  ⚠ Hatali veya eksik giris yapildi. Paket eklenemedi.");
+            System.out.println("  ⚠ Invalid or missing input. Package not added.");
         }
         printDivider();
     }
 
-    /** Option 11: Manuel Rota Ekleme */
+    /** Option 11: Add a route (edge) manually */
     private static void addNewRoute(Scanner scanner) {
-        printSectionHeader("YENI ROTA (KENAR) EKLEME");
-        System.out.print("  Kaynak Semt giriniz ▸ ");
+        printSectionHeader("ADD NEW ROUTE (EDGE)");
+        System.out.print("  Enter Source District ▸ ");
         String source = scanner.nextLine().trim();
-        System.out.print("  Hedef Semt giriniz ▸ ");
+        System.out.print("  Enter Target District ▸ ");
         String dest = scanner.nextLine().trim();
-        System.out.print("  Mesafe (km) giriniz ▸ ");
+        System.out.print("  Enter Distance (km) ▸ ");
         String distStr = scanner.nextLine().trim();
 
         try {
             int dist = Integer.parseInt(distStr);
             if (!source.isEmpty() && !dest.isEmpty() && dist > 0) {
-                cityMap.addEdge(source, dest, dist); // Graf'a yeni kenar ekler
-                System.out.println("  ✔ Yeni rota basariyla eklendi: " + source + " ↔ " + dest + " (" + dist + " km)");
+                cityMap.addEdge(source, dest, dist); // add new edge to graph
+                System.out.println("  ✔ New route added successfully: " + source + " ↔ " + dest + " (" + dist + " km)");
             } else {
-                System.out.println("  ⚠ Hatali veya eksik giris yapildi. Rota eklenemedi.");
+                System.out.println("  ⚠ Invalid or missing input. Route not added.");
             }
         } catch (NumberFormatException e) {
-            System.out.println("  ⚠ Gecersiz mesafe formati. Lutfen sadece sayi giriniz.");
+            System.out.println("  ⚠ Invalid distance format. Please enter numbers only.");
         }
         printDivider();
     }
 
-    /** Option 12: Manuel Paket Silme — Ana Kayit Defteri (SLL) ve Giris Tamponu (DLL)'ndan kaldirir. */
+    /** Option 12: Delete a package manually — removes it from the Master Registry (SLL) and Intake Buffer (DLL). */
     private static void deletePackage(Scanner scanner) {
-        printSectionHeader("PAKET SILME");
-        System.out.print("  Silinecek Paket ID giriniz ▸ ");
+        printSectionHeader("DELETE PACKAGE");
+        System.out.print("  Enter Package ID to delete ▸ ");
         String pkgID = scanner.nextLine().trim();
 
         if (pkgID.isEmpty()) {
-            System.out.println("  ⚠ Bos giris. Silme islemi iptal edildi.");
+            System.out.println("  ⚠ Empty input. Deletion cancelled.");
             printDivider();
             return;
         }
 
-        Package fromRegistry = masterRegistry.removeRecord(pkgID); // SLL'den kaldir
-        Package fromBuffer   = intakeBuffer.removePackage(pkgID);  // DLL'den kaldir
+        Package fromRegistry = masterRegistry.removeRecord(pkgID); // remove from SLL
+        Package fromBuffer   = intakeBuffer.removePackage(pkgID);  // remove from DLL
 
         if (fromRegistry == null && fromBuffer == null) {
-            System.out.println("  ✘ Paket bulunamadi: '" + pkgID + "'");
+            System.out.println("  ✘ Package not found: '" + pkgID + "'");
         } else {
             Package shown = (fromRegistry != null) ? fromRegistry : fromBuffer;
-            System.out.println("  ✔ Paket sistemden silindi: " + shown);
-            System.out.println("    - Ana Kayit Defteri (SLL): "
-                    + (fromRegistry != null ? "kaldirildi" : "kayit yoktu"));
-            System.out.println("    - Giris Tamponu (DLL):     "
-                    + (fromBuffer != null ? "kaldirildi" : "tamponda yoktu"));
+            System.out.println("  ✔ Package deleted from system: " + shown);
+            System.out.println("    - Master Registry (SLL): "
+                    + (fromRegistry != null ? "removed" : "not present"));
+            System.out.println("    - Intake Buffer (DLL):   "
+                    + (fromBuffer != null ? "removed" : "not in buffer"));
         }
         printDivider();
     }
@@ -610,34 +610,34 @@ public class Main {
         System.out.println("  ║            ██║░░██║╚█████╔╝╚██████╔╝░░░██║░░░███████╗       ║");
         System.out.println("  ║            ╚═╝░░╚═╝░╚════╝░░╚═════╝░░░░╚═╝░░░╚══════╝       ║");
         System.out.println("  ║                                                            ║");
-        System.out.println("  ║        " + COMPANY_NAME + " — Kayseri Sehir Ici Lojistik         ║");
+        System.out.println("  ║        " + COMPANY_NAME + " — Kayseri Urban Logistics            ║");
         System.out.println("  ║        Urban Logistics & Distribution System  v1.0         ║");
         System.out.println("  ║        " + TAGLINE + "              ║");
         System.out.println("  ║                                                            ║");
-        System.out.println("  ║  Merkez Depo: Meydan, Kayseri                             ║");
-        System.out.println("  ║  Semtler: Alpaslan, Talas, Erkilet, Belsin,               ║");
-        System.out.println("  ║           Ildem, Mimsin, Anbar, Kocasinan                 ║");
+        System.out.println("  ║  Central Depot: Meydan, Kayseri                           ║");
+        System.out.println("  ║  Districts: Alpaslan, Talas, Erkilet, Belsin,             ║");
+        System.out.println("  ║             Ildem, Mimsin, Anbar, Kocasinan               ║");
         System.out.println("  ╚══════════════════════════════════════════════════════════════╝");
     }
 
     private static void printMenu() {
         System.out.println();
         System.out.println("  ┌──────────────────────────────────────────────────────────────┐");
-        System.out.printf( "  │              %s — Ana Menu                           │%n", COMPANY_NAME);
+        System.out.printf( "  │              %s — Main Menu                          │%n", COMPANY_NAME);
         System.out.println("  ├──────────────────────────────────────────────────────────────┤");
-        System.out.println("  │  [1]  Ana Kayit Defteri           (Singly Linked List)      │");
-        System.out.println("  │  [2]  Giris Tamponu               (Doubly Linked List)      │");
-        System.out.println("  │  [3]  Teslimat Kuyrugu            (FIFO Queue)              │");
-        System.out.println("  │  [4]  Arac Yukleme                (LIFO Stack)              │");
-        System.out.println("  │  [5]  Adres Rehberi               (AVL Tree)                │");
-        System.out.println("  │  [6]  Kayseri Sehir Haritasi      (Weighted Graph)          │");
-        System.out.println("  │  [7]  En Kisa Yol                 (Dijkstra Algoritmasi)    │");
-        System.out.println("  │  [8]  Minimum Yayilan Agac        (Prim Algoritmasi)        │");
-        System.out.println("  │  [9]  ★ Tam Demo                  (Tum Alt Sistemler)       │");
-        System.out.println("  │  [10] Yeni Paket Ekleme           (Manuel Giris)            │");
-        System.out.println("  │  [11] Yeni Rota Ekleme            (Manuel Giris)            │");
-        System.out.println("  │  [12] Paket Sil                   (Manuel Giris)            │");
-        System.out.println("  │  [0]  Cikis                                                 │");
+        System.out.println("  │  [1]  Master Registry             (Singly Linked List)      │");
+        System.out.println("  │  [2]  Intake Buffer               (Doubly Linked List)      │");
+        System.out.println("  │  [3]  Delivery Queue              (FIFO Queue)              │");
+        System.out.println("  │  [4]  Truck Loading               (LIFO Stack)              │");
+        System.out.println("  │  [5]  Address Directory           (AVL Tree)                │");
+        System.out.println("  │  [6]  Kayseri City Map            (Weighted Graph)          │");
+        System.out.println("  │  [7]  Shortest Path               (Dijkstra's Algorithm)    │");
+        System.out.println("  │  [8]  Minimum Spanning Tree       (Prim's Algorithm)        │");
+        System.out.println("  │  [9]  ★ Full Demo                 (All Subsystems)          │");
+        System.out.println("  │  [10] Add New Package             (Manual Entry)            │");
+        System.out.println("  │  [11] Add New Route               (Manual Entry)            │");
+        System.out.println("  │  [12] Delete Package              (Manual Entry)            │");
+        System.out.println("  │  [0]  Exit                                                  │");
         System.out.println("  └──────────────────────────────────────────────────────────────┘");
     }
 
@@ -662,10 +662,10 @@ public class Main {
     private static void printFooter() {
         System.out.println();
         System.out.println("  ╔══════════════════════════════════════════════════════════════╗");
-        System.out.println("  ║  " + COMPANY_NAME + " Lojistik Sistemini Kullandiginiz icin  ║");
-        System.out.println("  ║  Tesekkur Ederiz!                                           ║");
+        System.out.println("  ║  Thank you for using the                                    ║");
+        System.out.println("  ║  " + COMPANY_NAME + " Logistics System!                                ║");
         System.out.println("  ║  " + TAGLINE + "                          ║");
-        System.out.println("  ║  © 2026 " + COMPANY_NAME + ". Tum haklari saklidir.          ║");
+        System.out.println("  ║  © 2026 " + COMPANY_NAME + ". All rights reserved.                   ║");
         System.out.println("  ╚══════════════════════════════════════════════════════════════╝");
         System.out.println();
     }

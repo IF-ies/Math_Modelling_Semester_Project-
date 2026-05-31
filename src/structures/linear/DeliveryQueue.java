@@ -41,7 +41,7 @@ public class DeliveryQueue {
 
     /** Removes and returns the front package — O(1). */
     public Package dequeue() {
-        if (front == null) { System.out.println("    ⚠ Kuyruk bos."); return null; }
+        if (front == null) { System.out.println("    ⚠ Queue is empty."); return null; }
         Package removed = front.data;
         front = front.next;
         if (front == null) rear = null;
@@ -54,7 +54,7 @@ public class DeliveryQueue {
 
     /** Prints all packages front to rear. */
     public void displayQueue() {
-        if (front == null) { System.out.println("    (Kuyruk bos)"); return; }
+        if (front == null) { System.out.println("    (Queue is empty)"); return; }
         Node current = front;
         int index = 1;
         while (current != null) { System.out.printf("    %3d. %s%n", index++, current.data); current = current.next; }

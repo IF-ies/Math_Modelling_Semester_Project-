@@ -1,10 +1,10 @@
 # Veteran - Urban Logistics & Distribution System
-## Kayseri Şehir İçi Dağıtım ve Lojistik Yönetimi
+## Kayseri Urban Delivery & Logistics Management
 
-**Grup:** Veteran | **Üniversite:** Abdullah Gül University (AGÜ)
+**Group:** Veteran | **University:** Abdullah Gül University (AGÜ)
 
-### Grup Üyeleri
-| # | İsim | Öğrenci No |
+### Group Members
+| # | Name | Student No |
 |---|------|------------|
 | 1 | Ahmet Uzungöl | 2211051063 |
 | 2 | Sümeyra Yıldız | 2211051070 |
@@ -12,19 +12,23 @@
 | 4 | Abdullah İnce | 2211051010 |
 | 5 | İbrahim Furkan Yılmaz | 2211051013 |
 
-### Merkez Depo: Meydan, Kayseri
-**Semtler:** Alpaslan, Talas, Erkilet, Belsin, İldem, Mimsin, Anbar, Kocasinan
+### Central Depot: Meydan, Kayseri
+**Districts:** Alpaslan, Talas, Erkilet, Belsin, İldem, Mimsin, Anbar, Kocasinan
 
-### Uygulanan Veri Yapıları
-- **SLL** — Ana Kayıt Defteri (Master Registry)
-- **DLL** — Giriş Tamponu (Intake Buffer)
-- **Queue (FIFO)** — Teslimat Kuyruğu
-- **Stack (LIFO)** — Araç Yükleme
-- **AVL Tree** — Adres Rehberi
-- **Weighted Graph** — Kayseri Şehir Haritası + Dijkstra + Prim
+### Implemented Data Structures
+- **SLL** — Master Registry
+- **DLL** — Intake Buffer
+- **Queue (FIFO)** — Delivery Queue
+- **Stack (LIFO)** — Truck Loading
+- **AVL Tree** — Address Directory
+- **Weighted Graph** — Kayseri City Map + Dijkstra + Prim
 
-### Derleme & Çalıştırma
+### Build & Run
 ```bash
 javac -d out src/models/Package.java src/structures/linear/*.java src/structures/tree/*.java src/structures/graph/*.java src/Main.java
 java -cp out Main
 ```
+
+Or double-click **`baslat.bat`** for the GUI. The GUI compiles the current
+source on every launch and runs it, so it always reflects the latest code
+(a JDK must be installed, or `JAVA_HOME` set).

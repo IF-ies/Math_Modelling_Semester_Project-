@@ -12,7 +12,7 @@ package structures.graph;
  *   Dijkstra's  — shortest path between two locations
  *   Prim's      — Minimum Spanning Tree (MST)
  *
- * Merkez Depo (Hub): Meydan
+ * Central Depot (Hub): Meydan
  *
  * @author Veteran Development Team
  */
@@ -101,7 +101,7 @@ public class CityGraph {
         int srcIdx = getVertexIndex(start);
         int endIdx = getVertexIndex(end);
         if (srcIdx == -1 || endIdx == -1) {
-            System.out.println("    ⚠ Konum haritada bulunamadi: " + start + " veya " + end);
+            System.out.println("    ⚠ Location not found on map: " + start + " or " + end);
             return;
         }
 
@@ -135,7 +135,7 @@ public class CityGraph {
         }
 
         if (dist[endIdx] == INF) {
-            System.out.println("    ⚠ " + start + " ile " + end + " arasinda yol yok.");
+            System.out.println("    ⚠ " + start + " and " + end + " have no connecting path.");
             return;
         }
 
@@ -144,15 +144,15 @@ public class CityGraph {
         int pathLen = 0;
         for (int at = endIdx; at != -1; at = prev[at]) path[pathLen++] = vertexNames[at];
 
-        System.out.printf("    En kisa mesafe : %d km%n", dist[endIdx]);
-        System.out.print("    Rota           : ");
+        System.out.printf("    Shortest distance : %d km%n", dist[endIdx]);
+        System.out.print("    Route             : ");
         for (int i = pathLen - 1; i >= 0; i--) {
             System.out.print(path[i]);
             if (i > 0) System.out.print(" → ");
         }
         System.out.println();
 
-        System.out.println("    Adim adim:");
+        System.out.println("    Step by step:");
         for (int i = pathLen - 1; i > 0; i--) {
             int fromIdx = getVertexIndex(path[i]);
             int toIdx   = getVertexIndex(path[i - 1]);
@@ -173,7 +173,7 @@ public class CityGraph {
      * Time complexity: O(V^2) — array-scanning variant.
      */
     public void calculateMST() {
-        if (vertexCount == 0) { System.out.println("    ⚠ Graf bos — MST hesaplanamaz."); return; }
+        if (vertexCount == 0) { System.out.println("    ⚠ Graph is empty — MST cannot be computed."); return; }
 
         final int INF = Integer.MAX_VALUE;
         int[]     key    = new int[vertexCount];
@@ -203,16 +203,16 @@ public class CityGraph {
             }
         }
 
-        System.out.println("    MST Kenarlari (Prim Algoritmasi) — Kayseri Altyapi Agi:");
+        System.out.println("    MST Edges (Prim's Algorithm) — Kayseri Infrastructure Network:");
         System.out.println("    ─────────────────────────────────────────────────────");
-        System.out.printf("    %-15s %-15s %s%n", "Kaynak", "Hedef", "Mesafe (km)");
+        System.out.printf("    %-15s %-15s %s%n", "Source", "Target", "Distance (km)");
         System.out.println("    ─────────────────────────────────────────────────────");
         for (int i = 1; i < vertexCount; i++) {
             if (parent[i] != -1)
                 System.out.printf("    %-15s %-15s %d%n", vertexNames[parent[i]], vertexNames[i], key[i]);
         }
         System.out.println("    ─────────────────────────────────────────────────────");
-        System.out.printf("    Toplam MST Agirlik: %d km%n", totalWeight);
+        System.out.printf("    Total MST Weight: %d km%n", totalWeight);
     }
 
     // ─── Utility ─────────────────────────────────────────────────────

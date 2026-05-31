@@ -137,20 +137,20 @@ public class AVLTree {
     // ─── Traversals ──────────────────────────────────────────────────
 
     public void inOrderTraversal() {
-        if (root == null) { System.out.println("    (Adres rehberi bos)"); return; }
+        if (root == null) { System.out.println("    (Address directory is empty)"); return; }
         inOrderRec(root);
     }
 
     private void inOrderRec(AVLNode node) {
         if (node == null) return;
         inOrderRec(node.left);
-        System.out.printf("    %-20s → Musteri: %-20s (h=%d)%n",
+        System.out.printf("    %-20s → Customer: %-20s (h=%d)%n",
                 node.neighborhood, node.customerID, node.height);
         inOrderRec(node.right);
     }
 
     public void printTree() {
-        if (root == null) { System.out.println("    (Adres rehberi bos)"); return; }
+        if (root == null) { System.out.println("    (Address directory is empty)"); return; }
         printTreeRec(root, "", true);
     }
 

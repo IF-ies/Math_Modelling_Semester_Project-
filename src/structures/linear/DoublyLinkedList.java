@@ -52,7 +52,7 @@ public class DoublyLinkedList {
 
     /** Removes and returns head — O(1). */
     public Package removeFromHead() {
-        if (head == null) { System.out.println("    ⚠ Tampon bos."); return null; }
+        if (head == null) { System.out.println("    ⚠ Buffer is empty."); return null; }
         Package removed = head.data;
         if (head == tail) { head = null; tail = null; }
         else { head = head.next; head.prev = null; }
@@ -62,7 +62,7 @@ public class DoublyLinkedList {
 
     /** Removes and returns tail — O(1) via prev pointer. */
     public Package removeFromTail() {
-        if (tail == null) { System.out.println("    ⚠ Tampon bos."); return null; }
+        if (tail == null) { System.out.println("    ⚠ Buffer is empty."); return null; }
         Package removed = tail.data;
         if (head == tail) { head = null; tail = null; }
         else { tail = tail.prev; tail.next = null; }
@@ -82,12 +82,12 @@ public class DoublyLinkedList {
             }
             current = current.next;
         }
-        return null; // bulunamadi — mesajlamayi cagiran ustlenir
+        return null; // not found — caller handles messaging
     }
 
     /** Prints buffer head → tail. */
     public void displayBuffer() {
-        if (head == null) { System.out.println("    (Tampon bos)"); return; }
+        if (head == null) { System.out.println("    (Buffer is empty)"); return; }
         Node current = head;
         int index = 1;
         while (current != null) { System.out.printf("    %3d. %s%n", index++, current.data); current = current.next; }
@@ -95,7 +95,7 @@ public class DoublyLinkedList {
 
     /** Prints buffer tail → head. */
     public void displayReverse() {
-        if (tail == null) { System.out.println("    (Tampon bos)"); return; }
+        if (tail == null) { System.out.println("    (Buffer is empty)"); return; }
         Node current = tail;
         int index = size;
         while (current != null) { System.out.printf("    %3d. %s%n", index--, current.data); current = current.prev; }

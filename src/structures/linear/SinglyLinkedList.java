@@ -43,7 +43,7 @@ public class SinglyLinkedList {
 
     /** Traverses and prints all records — O(n). */
     public void displayLog() {
-        if (head == null) { System.out.println("    (Kayit defteri bos)"); return; }
+        if (head == null) { System.out.println("    (Registry is empty)"); return; }
         Node current = head;
         int index = 1;
         while (current != null) {

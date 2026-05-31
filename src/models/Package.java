@@ -14,7 +14,7 @@ public class Package {
     // ─── Fields ──────────────────────────────────────────────────────
     private String packageID;
     private String destination;
-    private int priority;       // 1 = En Yuksek, 5 = En Dusuk
+    private int priority;       // 1 = Highest, 5 = Lowest
     private double weightKg;
 
     // ─── Constructors ────────────────────────────────────────────────
@@ -57,7 +57,7 @@ public class Package {
     // ─── Display ─────────────────────────────────────────────────────
     @Override
     public String toString() {
-        return String.format("[%s] → %s | Oncelik: %d | Agirlik: %.1f kg",
+        return String.format("[%s] → %s | Priority: %d | Weight: %.1f kg",
                 packageID, destination, priority, weightKg);
     }
 }

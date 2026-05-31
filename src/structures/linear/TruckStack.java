@@ -40,7 +40,7 @@ public class TruckStack {
 
     /** Pops and returns the top package — O(1). */
     public Package pop() {
-        if (top == null) { System.out.println("    ⚠ Arac yuk alani bos."); return null; }
+        if (top == null) { System.out.println("    ⚠ Truck loading bay is empty."); return null; }
         Package removed = top.data;
         top = top.next;
         size--;
@@ -52,12 +52,12 @@ public class TruckStack {
 
     /** Prints all packages top to bottom. */
     public void displayStack() {
-        if (top == null) { System.out.println("    (Arac yuk alani bos)"); return; }
+        if (top == null) { System.out.println("    (Truck loading bay is empty)"); return; }
         Node current = top;
         int index = 1;
-        System.out.println("    [UST / TOP]");
+        System.out.println("    [TOP]");
         while (current != null) { System.out.printf("    %3d. %s%n", index++, current.data); current = current.next; }
-        System.out.println("    [ALT / BOTTOM]");
+        System.out.println("    [BOTTOM]");
     }
 
     public int     getSize()  { return size; }

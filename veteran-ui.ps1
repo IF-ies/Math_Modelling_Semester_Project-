@@ -2,7 +2,7 @@ Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
-# PowerShell konsol penceresini gizle (form acilmadan once)
+# Hide the PowerShell console window (before the form opens)
 $null = Add-Type -Name ConWin -Namespace Native -PassThru -MemberDefinition '
 [DllImport("kernel32.dll")] public static extern IntPtr GetConsoleWindow();
 [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
@@ -16,8 +16,8 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $srcDir    = Join-Path $scriptDir "src"
 $outDir    = Join-Path $scriptDir "out"
 
-# ---------- JDK bul (javac gerekli) ----------
-# Donmus exe yerine: her acilista guncel kaynagi derle + calistir.
+# ---------- Find JDK (javac required) ----------
+# Instead of a frozen exe: compile the current source on every launch + run it.
 function Find-JavacDir {
     if ($env:JAVA_HOME -and (Test-Path (Join-Path $env:JAVA_HOME "bin\javac.exe"))) {
         return (Join-Path $env:JAVA_HOME "bin")
@@ -36,7 +36,7 @@ function Find-JavacDir {
 $jdkBin = Find-JavacDir
 if (-not $jdkBin) {
     [System.Windows.Forms.MessageBox]::Show(
-        "JDK bulunamadi (javac.exe gerekli).`nBir JDK kurun veya JAVA_HOME tanimlayin.",
+        "JDK not found (javac.exe required).`nInstall a JDK or set JAVA_HOME.",
         "Hata",
         [System.Windows.Forms.MessageBoxButtons]::OK,
         [System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
@@ -45,12 +45,12 @@ if (-not $jdkBin) {
 $javacExe = Join-Path $jdkBin "javac.exe"
 $javaExe  = Join-Path $jdkBin "java.exe"
 
-# ---------- Kaynagi derle (guncel kod) ----------
+# ---------- Compile source (current code) ----------
 $srcFiles = (Get-ChildItem $srcDir -Recurse -Filter *.java).FullName
 $compileLog = & $javacExe -encoding UTF-8 -d $outDir $srcFiles 2>&1
 if ($LASTEXITCODE -ne 0) {
     [System.Windows.Forms.MessageBox]::Show(
-        "Derleme hatasi:`n`n$($compileLog -join "`n")",
+        "Compile error:`n`n$($compileLog -join "`n")",
         "Hata",
         [System.Windows.Forms.MessageBoxButtons]::OK,
         [System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
@@ -95,9 +95,9 @@ $buttonInfo = @(
     @{ Text = "7  Shortest Path";         Cmd = "7" }
     @{ Text = "8  Minimum Spanning Tree"; Cmd = "8" }
     @{ Text = "9  Run Full Demo";         Cmd = "9" }
-    @{ Text = "10 Yeni Paket Ekle";       Cmd = "10" }
-    @{ Text = "11 Yeni Rota Ekle";        Cmd = "11" }
-    @{ Text = "12 Paket Sil";             Cmd = "12" }
+    @{ Text = "10 Add Package";           Cmd = "10" }
+    @{ Text = "11 Add Route";             Cmd = "11" }
+    @{ Text = "12 Delete Package";        Cmd = "12" }
     @{ Text = "0  Exit Program";          Cmd = "0" }
 )
 
@@ -108,7 +108,7 @@ $inputBar.BackColor = [System.Drawing.Color]::FromArgb(45, 45, 48)
 $inputBar.Padding = New-Object System.Windows.Forms.Padding(10, 8, 10, 8)
 
 $sendBtn = New-Object System.Windows.Forms.Button
-$sendBtn.Text = "Gonder"; $sendBtn.Dock = "Right"; $sendBtn.Width = 100
+$sendBtn.Text = "Send"; $sendBtn.Dock = "Right"; $sendBtn.Width = 100
 $sendBtn.FlatStyle = "Flat"
 $sendBtn.BackColor = [System.Drawing.Color]::FromArgb(0, 120, 80)
 $sendBtn.ForeColor = [System.Drawing.Color]::White
@@ -157,7 +157,7 @@ $proc = New-Object System.Diagnostics.Process
 $proc.StartInfo = $psi
 [void]$proc.Start()
 
-# Background thread: stdout'u oku, queue'ya yaz
+# Background thread: read stdout, write to queue
 $readerScript = {
     param($stream, $queueRef, $prefix)
     try {
@@ -180,7 +180,7 @@ $psErr = [PowerShell]::Create()
 [void]$psErr.AddScript($readerScript).AddArgument($proc.StandardError).AddArgument($queue).AddArgument("__ERR__")
 $asyncErr = $psErr.BeginInvoke()
 
-# Side button event'leri (proc artik var, kapatabilirler)
+# Side button events (proc now exists, can be closed)
 $btnY = 10
 foreach ($info in $buttonInfo) {
     $btn = New-Object System.Windows.Forms.Button
@@ -202,7 +202,7 @@ foreach ($info in $buttonInfo) {
                 $proc.StandardInput.Flush()
                 $queue.Enqueue("__USER__> " + $s.Tag + "`n")
             } catch {
-                $queue.Enqueue("__ERR__[Input hatasi: $($_.Exception.Message)]`n")
+                $queue.Enqueue("__ERR__[Input error: $($_.Exception.Message)]`n")
             }
         }
     }.GetNewClosure())

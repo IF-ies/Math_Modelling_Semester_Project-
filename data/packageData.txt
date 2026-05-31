@@ -1,5 +1,5 @@
 # PackageID Destination
-# Her paket Meydan deposundan ilgili Kayseri semtine teslim edilecektir.
+# Each package is delivered from the Meydan depot to its Kayseri district.
 PKG_KYS_001 Talas
 PKG_KYS_002 Belsin
 PKG_KYS_003 Ildem
