@@ -13,12 +13,44 @@ if ($consoleHandle -ne [IntPtr]::Zero) {
 }
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$exePath   = Join-Path $scriptDir "build\dist\Veteran\Veteran.exe"
-$workDir   = Join-Path $scriptDir "build\dist\Veteran"
+$srcDir    = Join-Path $scriptDir "src"
+$outDir    = Join-Path $scriptDir "out"
 
-if (-not (Test-Path $exePath)) {
+# ---------- JDK bul (javac gerekli) ----------
+# Donmus exe yerine: her acilista guncel kaynagi derle + calistir.
+function Find-JavacDir {
+    if ($env:JAVA_HOME -and (Test-Path (Join-Path $env:JAVA_HOME "bin\javac.exe"))) {
+        return (Join-Path $env:JAVA_HOME "bin")
+    }
+    $onPath = Get-Command javac.exe -ErrorAction SilentlyContinue
+    if ($onPath) { return (Split-Path $onPath.Source) }
+    $userJdk = Get-ChildItem $env:USERPROFILE -Directory -Filter 'jdk*' -ErrorAction SilentlyContinue |
+        ForEach-Object { Join-Path $_.FullName 'bin\javac.exe' } |
+        Where-Object { Test-Path $_ } | Select-Object -First 1
+    if ($userJdk) { return (Split-Path $userJdk) }
+    $androidJbr = 'C:\Program Files\Android\Android Studio\jbr\bin\javac.exe'
+    if (Test-Path $androidJbr) { return (Split-Path $androidJbr) }
+    return $null
+}
+
+$jdkBin = Find-JavacDir
+if (-not $jdkBin) {
     [System.Windows.Forms.MessageBox]::Show(
-        "Veteran.exe bulunamadi:`n$exePath",
+        "JDK bulunamadi (javac.exe gerekli).`nBir JDK kurun veya JAVA_HOME tanimlayin.",
+        "Hata",
+        [System.Windows.Forms.MessageBoxButtons]::OK,
+        [System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+    return
+}
+$javacExe = Join-Path $jdkBin "javac.exe"
+$javaExe  = Join-Path $jdkBin "java.exe"
+
+# ---------- Kaynagi derle (guncel kod) ----------
+$srcFiles = (Get-ChildItem $srcDir -Recurse -Filter *.java).FullName
+$compileLog = & $javacExe -encoding UTF-8 -d $outDir $srcFiles 2>&1
+if ($LASTEXITCODE -ne 0) {
+    [System.Windows.Forms.MessageBox]::Show(
+        "Derleme hatasi:`n`n$($compileLog -join "`n")",
         "Hata",
         [System.Windows.Forms.MessageBoxButtons]::OK,
         [System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
@@ -63,6 +95,9 @@ $buttonInfo = @(
     @{ Text = "7  Shortest Path";         Cmd = "7" }
     @{ Text = "8  Minimum Spanning Tree"; Cmd = "8" }
     @{ Text = "9  Run Full Demo";         Cmd = "9" }
+    @{ Text = "10 Yeni Paket Ekle";       Cmd = "10" }
+    @{ Text = "11 Yeni Rota Ekle";        Cmd = "11" }
+    @{ Text = "12 Paket Sil";             Cmd = "12" }
     @{ Text = "0  Exit Program";          Cmd = "0" }
 )
 
@@ -107,8 +142,9 @@ $form.Controls.Add($titleBar)
 
 # ---------- Process ----------
 $psi = New-Object System.Diagnostics.ProcessStartInfo
-$psi.FileName = $exePath
-$psi.WorkingDirectory = $workDir
+$psi.FileName = $javaExe
+$psi.Arguments = "-Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8 -Dfile.encoding=UTF-8 -cp `"$outDir`" Main"
+$psi.WorkingDirectory = $scriptDir
 $psi.UseShellExecute = $false
 $psi.RedirectStandardInput = $true
 $psi.RedirectStandardOutput = $true

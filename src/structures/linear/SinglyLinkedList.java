@@ -11,10 +11,11 @@ import models.Package;
  * the Veteran Kayseri system.
  *
  * Operations:
- *   addRecord(Package)  — O(1) append to tail
- *   displayLog()        — O(n) traversal and print
- *   getSize()           — O(1) size query
- *   search(String id)   — O(n) linear search by PackageID
+ *   addRecord(Package)     — O(1) append to tail
+ *   removeRecord(String id) — O(n) unlink by PackageID
+ *   displayLog()           — O(n) traversal and print
+ *   getSize()              — O(1) size query
+ *   search(String id)      — O(n) linear search by PackageID
  *
  * @author Veteran Development Team
  */
@@ -49,6 +50,27 @@ public class SinglyLinkedList {
             System.out.printf("    %3d. %s%n", index++, current.data);
             current = current.next;
         }
+    }
+
+    /**
+     * Removes the first record matching the given PackageID — O(n).
+     * Keeps head/tail/size consistent. Returns the removed Package, or null if absent.
+     */
+    public Package removeRecord(String packageID) {
+        Node current = head;
+        Node prev = null;
+        while (current != null) {
+            if (current.data.getPackageID().equalsIgnoreCase(packageID)) {
+                if (prev == null) head = current.next;   // removing head
+                else prev.next = current.next;           // bypass node
+                if (current == tail) tail = prev;         // removing tail
+                size--;
+                return current.data;
+            }
+            prev = current;
+            current = current.next;
+        }
+        return null;
     }
 
     /** Linear search by package ID — O(n). */

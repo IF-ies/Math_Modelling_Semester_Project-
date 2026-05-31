@@ -82,8 +82,7 @@ public class DoublyLinkedList {
             }
             current = current.next;
         }
-        System.out.println("    ⚠ Paket bulunamadi: " + packageID);
-        return null;
+        return null; // bulunamadi — mesajlamayi cagiran ustlenir
     }
 
     /** Prints buffer head → tail. */

@@ -117,6 +117,9 @@ public class Main {
                 case "11":
                     addNewRoute(scanner);
                     break;
+                case "12":
+                    deletePackage(scanner);
+                    break;
                 case "0":
                     running = false;
                     break;
@@ -557,6 +560,34 @@ public class Main {
         printDivider();
     }
 
+    /** Option 12: Manuel Paket Silme — Ana Kayit Defteri (SLL) ve Giris Tamponu (DLL)'ndan kaldirir. */
+    private static void deletePackage(Scanner scanner) {
+        printSectionHeader("PAKET SILME");
+        System.out.print("  Silinecek Paket ID giriniz ▸ ");
+        String pkgID = scanner.nextLine().trim();
+
+        if (pkgID.isEmpty()) {
+            System.out.println("  ⚠ Bos giris. Silme islemi iptal edildi.");
+            printDivider();
+            return;
+        }
+
+        Package fromRegistry = masterRegistry.removeRecord(pkgID); // SLL'den kaldir
+        Package fromBuffer   = intakeBuffer.removePackage(pkgID);  // DLL'den kaldir
+
+        if (fromRegistry == null && fromBuffer == null) {
+            System.out.println("  ✘ Paket bulunamadi: '" + pkgID + "'");
+        } else {
+            Package shown = (fromRegistry != null) ? fromRegistry : fromBuffer;
+            System.out.println("  ✔ Paket sistemden silindi: " + shown);
+            System.out.println("    - Ana Kayit Defteri (SLL): "
+                    + (fromRegistry != null ? "kaldirildi" : "kayit yoktu"));
+            System.out.println("    - Giris Tamponu (DLL):     "
+                    + (fromBuffer != null ? "kaldirildi" : "tamponda yoktu"));
+        }
+        printDivider();
+    }
+
     // ═══════════════════════════════════════════════════════════════
     //  UI HELPERS
     // ═══════════════════════════════════════════════════════════════
@@ -605,6 +636,7 @@ public class Main {
         System.out.println("  │  [9]  ★ Tam Demo                  (Tum Alt Sistemler)       │");
         System.out.println("  │  [10] Yeni Paket Ekleme           (Manuel Giris)            │");
         System.out.println("  │  [11] Yeni Rota Ekleme            (Manuel Giris)            │");
+        System.out.println("  │  [12] Paket Sil                   (Manuel Giris)            │");
         System.out.println("  │  [0]  Cikis                                                 │");
         System.out.println("  └──────────────────────────────────────────────────────────────┘");
     }
