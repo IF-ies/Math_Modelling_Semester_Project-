@@ -111,6 +111,12 @@ public class Main {
                 case "9":
                     runFullDemo();
                     break;
+                case "10":
+                    addNewPackage(scanner);
+                    break;
+                case "11":
+                    addNewRoute(scanner);
+                    break;
                 case "0":
                     running = false;
                     break;
@@ -161,9 +167,9 @@ public class Main {
 
     /**
      * Reads packageData.txt and:
-     *   1) Registers each package in the Master Registry (SLL)
-     *   2) Adds each package to the Intake Buffer (DLL)
-     *   3) Inserts each destination into the Address Directory (AVL)
+     * 1) Registers each package in the Master Registry (SLL)
+     * 2) Adds each package to the Intake Buffer (DLL)
+     * 3) Inserts each destination into the Address Directory (AVL)
      *
      * Expected format per line: PackageID Destination
      */
@@ -505,6 +511,52 @@ public class Main {
         printDivider();
     }
 
+    /** Option 10: Manuel Paket Ekleme */
+    private static void addNewPackage(Scanner scanner) {
+        printSectionHeader("YENI PAKET EKLEME");
+        System.out.print("  Paket ID giriniz (orn. PKG_KYS_099) ▸ ");
+        String pkgID = scanner.nextLine().trim();
+        System.out.print("  Hedef Semt giriniz ▸ ");
+        String dest = scanner.nextLine().trim();
+
+        if (!pkgID.isEmpty() && !dest.isEmpty()) {
+            Package newPkg = new Package(pkgID, dest);
+
+            masterRegistry.addRecord(newPkg); // SLL'ye ekler
+            intakeBuffer.insertAtTail(newPkg); // DLL'ye ekler
+            addressDirectory.insert(dest, pkgID); // AVL Tree'ye ekler
+
+            System.out.println("  ✔ Paket sisteme basariyla eklendi: " + newPkg);
+        } else {
+            System.out.println("  ⚠ Hatali veya eksik giris yapildi. Paket eklenemedi.");
+        }
+        printDivider();
+    }
+
+    /** Option 11: Manuel Rota Ekleme */
+    private static void addNewRoute(Scanner scanner) {
+        printSectionHeader("YENI ROTA (KENAR) EKLEME");
+        System.out.print("  Kaynak Semt giriniz ▸ ");
+        String source = scanner.nextLine().trim();
+        System.out.print("  Hedef Semt giriniz ▸ ");
+        String dest = scanner.nextLine().trim();
+        System.out.print("  Mesafe (km) giriniz ▸ ");
+        String distStr = scanner.nextLine().trim();
+
+        try {
+            int dist = Integer.parseInt(distStr);
+            if (!source.isEmpty() && !dest.isEmpty() && dist > 0) {
+                cityMap.addEdge(source, dest, dist); // Graf'a yeni kenar ekler
+                System.out.println("  ✔ Yeni rota basariyla eklendi: " + source + " ↔ " + dest + " (" + dist + " km)");
+            } else {
+                System.out.println("  ⚠ Hatali veya eksik giris yapildi. Rota eklenemedi.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("  ⚠ Gecersiz mesafe formati. Lutfen sadece sayi giriniz.");
+        }
+        printDivider();
+    }
+
     // ═══════════════════════════════════════════════════════════════
     //  UI HELPERS
     // ═══════════════════════════════════════════════════════════════
@@ -551,6 +603,8 @@ public class Main {
         System.out.println("  │  [7]  En Kisa Yol                 (Dijkstra Algoritmasi)    │");
         System.out.println("  │  [8]  Minimum Yayilan Agac        (Prim Algoritmasi)        │");
         System.out.println("  │  [9]  ★ Tam Demo                  (Tum Alt Sistemler)       │");
+        System.out.println("  │  [10] Yeni Paket Ekleme           (Manuel Giris)            │");
+        System.out.println("  │  [11] Yeni Rota Ekleme            (Manuel Giris)            │");
         System.out.println("  │  [0]  Cikis                                                 │");
         System.out.println("  └──────────────────────────────────────────────────────────────┘");
     }
