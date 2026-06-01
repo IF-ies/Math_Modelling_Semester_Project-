@@ -346,7 +346,7 @@ Format: `PKG_KYS_XXX`. Her satır okunduğunda:
 2. **Intake Buffer**'a `insertAtTail(pkg)` ile eklenir (DLL)
 3. **Address Directory**'e `insert(destination, packageID)` ile eklenir (AVL)
 
-Demonstrasyon veri seti **12 paket** ve Kayseri'nin 7 farklı semtini kapsamaktadır.
+Demonstrasyon veri seti **12 paket** ve Kayseri'nin 8 farklı semtini kapsamaktadır.
 
 ---
 
