@@ -4,8 +4,3 @@ build/
 .idea/
 *.iml
 .vscode/
-
-# Python / PyInstaller build artifacts
-__pycache__/
-app/_build/
-app/_dist/
