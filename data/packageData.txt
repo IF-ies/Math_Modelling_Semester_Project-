@@ -1,14 +1,15 @@
-# PackageID Destination
+# PackageID Destination Priority
 # Each package is delivered from the Meydan depot to its Kayseri district.
-PKG_KYS_001 Talas
-PKG_KYS_002 Belsin
-PKG_KYS_003 Ildem
-PKG_KYS_004 Anbar
-PKG_KYS_005 Erkilet
-PKG_KYS_006 Mimsin
-PKG_KYS_007 Alpaslan
-PKG_KYS_008 Talas
-PKG_KYS_009 Belsin
-PKG_KYS_010 Kocasinan
-PKG_KYS_011 Ildem
-PKG_KYS_012 Erkilet
+# Priority: 1 = Highest (most urgent) ... 5 = Lowest. Default = 3 if omitted.
+PKG_KYS_001 Talas 2
+PKG_KYS_002 Belsin 1
+PKG_KYS_003 Ildem 3
+PKG_KYS_004 Anbar 5
+PKG_KYS_005 Erkilet 1
+PKG_KYS_006 Mimsin 4
+PKG_KYS_007 Alpaslan 2
+PKG_KYS_008 Talas 3
+PKG_KYS_009 Belsin 5
+PKG_KYS_010 Kocasinan 1
+PKG_KYS_011 Ildem 4
+PKG_KYS_012 Erkilet 2

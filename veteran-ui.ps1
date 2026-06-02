@@ -98,6 +98,7 @@ $buttonInfo = @(
     @{ Text = "10 Add Package";           Cmd = "10" }
     @{ Text = "11 Add Route";             Cmd = "11" }
     @{ Text = "12 Delete Package";        Cmd = "12" }
+    @{ Text = "13 Priority Dispatch";     Cmd = "13" }
     @{ Text = "0  Exit Program";          Cmd = "0" }
 )
 

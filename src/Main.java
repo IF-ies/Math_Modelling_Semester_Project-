@@ -2,6 +2,7 @@ import models.Package;
 import structures.linear.SinglyLinkedList;
 import structures.linear.DoublyLinkedList;
 import structures.linear.DeliveryQueue;
+import structures.linear.PriorityDeliveryQueue;
 import structures.linear.TruckStack;
 import structures.tree.AVLTree;
 import structures.graph.CityGraph;
@@ -52,6 +53,7 @@ public class Main {
     private static final SinglyLinkedList masterRegistry   = new SinglyLinkedList();
     private static final DoublyLinkedList intakeBuffer     = new DoublyLinkedList();
     private static final DeliveryQueue    deliveryQueue    = new DeliveryQueue();
+    private static final PriorityDeliveryQueue priorityDispatch = new PriorityDeliveryQueue();
     private static final TruckStack       truckStack       = new TruckStack();
     private static final AVLTree          addressDirectory = new AVLTree();
     private static final CityGraph        cityMap          = new CityGraph();
@@ -120,6 +122,9 @@ public class Main {
                 case "12":
                     deletePackage(scanner);
                     break;
+                case "13":
+                    processPriorityDispatch(scanner);
+                    break;
                 case "0":
                     running = false;
                     break;
@@ -172,9 +177,11 @@ public class Main {
      * Reads packageData.txt and:
      * 1) Registers each package in the Master Registry (SLL)
      * 2) Adds each package to the Intake Buffer (DLL)
-     * 3) Inserts each destination into the Address Directory (AVL)
+     * 3) Enqueues each package into the Priority Dispatch (Min-Heap)
+     * 4) Inserts each destination into the Address Directory (AVL)
      *
-     * Expected format per line: PackageID Destination
+     * Expected format per line: PackageID Destination [Priority]
+     * Priority is optional (1 = highest .. 5 = lowest); defaults to 3.
      */
     private static void loadPackageData() {
         System.out.println("\n  ▶ Loading Kayseri package data: " + PACKAGE_DATA_FILE);
@@ -189,13 +196,23 @@ public class Main {
                 if (parts.length >= 2) {
                     String packageID   = parts[0];
                     String destination = parts[1];
-                    Package pkg = new Package(packageID, destination);
+
+                    // Optional 3rd column = priority (1 highest .. 5 lowest); default 3
+                    int priority = 3;
+                    if (parts.length >= 3) {
+                        try { priority = Integer.parseInt(parts[2]); }
+                        catch (NumberFormatException e) { priority = 3; }
+                    }
+                    Package pkg = new Package(packageID, destination, priority, 1.0);
 
                     // Register in Master Registry (SLL)
                     masterRegistry.addRecord(pkg);
 
                     // Add to Intake Buffer (DLL)
                     intakeBuffer.insertAtTail(pkg);
+
+                    // Enqueue into Priority Dispatch (Min-Heap)
+                    priorityDispatch.enqueue(pkg);
 
                     // Insert into Address Directory (AVL Tree)
                     addressDirectory.insert(destination, packageID);
@@ -507,6 +524,15 @@ public class Main {
         printSubSection("8. MINIMUM SPANNING TREE — Prim's Algorithm");
         cityMap.calculateMST();
 
+        // ── 9. Priority Dispatch (Min-Heap) ────────────────────
+        printSubSection("9. PRIORITY DISPATCH (Priority Queue — Min-Heap)");
+        System.out.println("  Packages ordered by urgency (1 = highest .. 5 = lowest):");
+        priorityDispatch.displayQueue();
+        Package mostUrgent = priorityDispatch.peek();
+        if (mostUrgent != null) {
+            System.out.println("\n  ▶ Next to dispatch: " + mostUrgent);
+        }
+
         System.out.println();
         printDivider();
         System.out.println("  ✔ Full demonstration complete.");
@@ -521,12 +547,22 @@ public class Main {
         String pkgID = scanner.nextLine().trim();
         System.out.print("  Enter Destination District ▸ ");
         String dest = scanner.nextLine().trim();
+        System.out.print("  Enter Priority (1=highest .. 5=lowest, blank=3) ▸ ");
+        String priStr = scanner.nextLine().trim();
 
         if (!pkgID.isEmpty() && !dest.isEmpty()) {
-            Package newPkg = new Package(pkgID, dest);
+            int priority = 3;
+            if (!priStr.isEmpty()) {
+                try { priority = Integer.parseInt(priStr); }
+                catch (NumberFormatException e) {
+                    System.out.println("  ⚠ Invalid priority — defaulting to 3.");
+                }
+            }
+            Package newPkg = new Package(pkgID, dest, priority, 1.0);
 
             masterRegistry.addRecord(newPkg);      // add to SLL
             intakeBuffer.insertAtTail(newPkg);     // add to DLL
+            priorityDispatch.enqueue(newPkg);      // add to Min-Heap
             addressDirectory.insert(dest, pkgID);  // add to AVL Tree
 
             System.out.println("  ✔ Package added to system successfully: " + newPkg);
@@ -588,6 +624,60 @@ public class Main {
         printDivider();
     }
 
+    /**
+     * Option 13: Priority Dispatch (Binary Min-Heap).
+     * Packages leave in order of urgency — lowest priority number first
+     * (1 = highest .. 5 = lowest), ties broken by arrival order.
+     */
+    private static void processPriorityDispatch(Scanner scanner) {
+        printSectionHeader("PRIORITY DISPATCH (Priority Queue — Min-Heap)");
+
+        System.out.println("  [1] Display packages in priority order (non-destructive)");
+        System.out.println("  [2] Peek most urgent package");
+        System.out.println("  [3] Dispatch most urgent package (dequeue)");
+        System.out.println("  [4] Dispatch ALL packages in priority order");
+        System.out.print("  Choice ▸ ");
+        String sub = scanner.nextLine().trim();
+
+        switch (sub) {
+            case "1":
+                System.out.println("  Pending dispatch (" + priorityDispatch.getSize()
+                        + " packages, most urgent first):");
+                priorityDispatch.displayQueue();
+                break;
+            case "2":
+                Package next = priorityDispatch.peek();
+                if (next != null) {
+                    System.out.println("  ▶ Most urgent: " + next);
+                } else {
+                    System.out.println("  (Priority queue is empty)");
+                }
+                break;
+            case "3":
+                Package dispatched = priorityDispatch.dequeue();
+                if (dispatched != null) {
+                    System.out.println("  ✔ Dispatched: " + dispatched);
+                }
+                break;
+            case "4":
+                if (priorityDispatch.isEmpty()) {
+                    System.out.println("  (Priority queue is empty)");
+                    break;
+                }
+                System.out.println("  Dispatching all packages by priority:");
+                int order = 1;
+                while (!priorityDispatch.isEmpty()) {
+                    Package p = priorityDispatch.dequeue();
+                    System.out.printf("    %3d. 🚚 %s%n", order++, p);
+                }
+                System.out.println("  ✔ All packages dispatched.");
+                break;
+            default:
+                System.out.println("  ⚠ Invalid choice.");
+        }
+        printDivider();
+    }
+
     // ═══════════════════════════════════════════════════════════════
     //  UI HELPERS
     // ═══════════════════════════════════════════════════════════════
@@ -637,6 +727,7 @@ public class Main {
         System.out.println("  │  [10] Add New Package             (Manual Entry)            │");
         System.out.println("  │  [11] Add New Route               (Manual Entry)            │");
         System.out.println("  │  [12] Delete Package              (Manual Entry)            │");
+        System.out.println("  │  [13] Priority Dispatch           (Priority Queue/Heap)     │");
         System.out.println("  │  [0]  Exit                                                  │");
         System.out.println("  └──────────────────────────────────────────────────────────────┘");
     }
